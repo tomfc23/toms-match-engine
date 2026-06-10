@@ -1,0 +1,38 @@
+{
+  "midfield": {
+    "home": {
+      "wins": 14801864,
+      "total": 29857964,
+      "win_pct": 0.496
+    },
+    "away": {
+      "wins": 15056100,
+      "total": 29857964,
+      "win_pct": 0.504
+    }
+  },
+  "home_defense": {
+    "home": {
+      "wins": 2892076,
+      "total": 5888786,
+      "win_pct": 0.491
+    },
+    "away": {
+      "wins": 2996710,
+      "total": 5888786,
+      "win_pct": 0.509
+    }
+  },
+  "away_defense": {
+    "home": {
+      "wins": 2843040,
+      "total": 5725329,
+      "win_pct": 0.497
+    },
+    "away": {
+      "wins": 2882289,
+      "total": 5725329,
+      "win_pct": 0.503
+    }
+  }
+}

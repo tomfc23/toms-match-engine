@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tom's Match Engine</title>
+        <style>
+            .mode-toggle {
+                display: flex;
+                gap: 0;
+                margin-bottom: 20px;
+                border: 2px solid #333;
+                border-radius: 6px;
+                overflow: hidden;
+                width: fit-content;
+                font-family: monospace;
+            }
+            .mode-btn {
+                padding: 8px 24px;
+                background: #fff;
+                border: none;
+                cursor: pointer;
+                font-family: monospace;
+                font-size: 1em;
+                font-weight: bold;
+                color: #333;
+                border-right: 2px solid #333;
+                transition: background 0.15s, color 0.15s;
+            }
+            .mode-btn:last-child { border-right: none; }
+            .mode-btn.active {
+                background: #333;
+                color: #fff;
+            }
+            .group-sim-controls {
+                font-family: monospace;
+            }
+            .group-sim-controls label {
+                display: block;
+                margin-bottom: 6px;
+            }
+            .group-standings-table {
+                border-collapse: collapse;
+                margin: 10px auto 20px;
+            }
+            .group-standings-table th, .group-standings-table td {
+                border: 1px solid #999;
+                padding: 6px 12px;
+                text-align: left;
+                font-family: monospace;
+            }
+            .group-standings-table th {
+                background: #eee;
+            }
+            .nation-cell {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .nation-logo-sm {
+                width: 32px;
+                height: 32px;
+                object-fit: contain;
+                border-radius: 50%;
+                border: 1px solid #ccc;
+            }
+            .game-log-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+            .game-log-row {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                background: #f5f5f5;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                padding: 8px 18px;
+                font-family: monospace;
+                font-weight: bold;
+                font-size: 1.05em;
+                min-width: 340px;
+                justify-content: space-between;
+            }
+            .game-log-team {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                width: 140px;
+            }
+            .game-log-team.away {
+                justify-content: flex-end;
+                flex-direction: row-reverse;
+            }
+            .game-log-score {
+                font-size: 1.3em;
+                min-width: 70px;
+                text-align: center;
+            }
+            .bar-container {
+                display: flex;
+                align-items: center;
+                margin-bottom: 4px;
+            }
+            .bar-label {
+                width: 150px;
+                text-align: right;
+                margin-right: 10px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .bar-outer {
+                background-color: #eee;
+                width: 200px;
+                height: 15px;
+                display: inline-block;
+            }
+            .bar-inner {
+                background-color: #4caf50;
+                height: 100%;
+            }
+            table {
+                border-collapse: collapse;
+                margin-bottom: 20px;
+            }
+            table, th, td {
+                border: 1px solid black;
+            }
+            th, td {
+                padding: 4px 8px;
+                text-align: left;
+            }
+            .metrics-row {
+                display: flex;
+                gap: 30px;
+                align-items: flex-start;
+                justify-content: center;
+                overflow-x: auto;
+                padding-bottom: 20px;
+            }
+            .metrics-col {
+                flex: 0 0 auto;
+            }
+            .podium-container {
+                display: flex;
+                align-items: flex-end;
+                justify-content: center;
+                gap: 30px;
+                margin-bottom: 20px;
+                height: 200px;
+            }
+            .podium-place {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-end;
+                font-family: monospace;
+                font-weight: bold;
+            }
+            .podium-bar {
+                width: 80px;
+                background-color: #ddd;
+                border: 1px solid #000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.9em;
+                color: #000;
+            }
+            .podium-name {
+                font-size: 0.8em;
+                text-align: center;
+                max-width: 80px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                margin-bottom: 5px;
+            }
+            .podium-img {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                object-fit: cover;
+                margin-bottom: 5px;
+                border: 2px solid #ddd;
+            }
+            .top-metrics-container {
+                display: flex;
+                gap: 100px;
+                justify-content: center;
+                align-items: flex-start;
+            }
+            .top-metric-section {
+                flex: 1;
+                max-width: 600px;
+            }
+            .podium-wrapper {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                justify-content: center;
+            }
+            summary {
+                cursor: pointer;
+                font-weight: bold;
+                font-size: 1.17em;
+                margin-top: 20px;
+                outline: none;
+                text-align: center;
+            }
+            details {
+                margin-bottom: 20px;
+            }
+            .duel-container {
+                display: flex;
+                flex-direction: row;
+                width: 600px;
+                height: 400px;
+                margin: 0 auto;
+                border: 2px solid #000;
+                font-family: monospace;
+                font-weight: bold;
+                text-align: center;
+                color: white;
+            }
+            .duel-third {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                position: relative;
+                overflow: hidden;
+                border-right: 1px solid #000;
+            }
+            .duel-third:last-child {
+                border-right: none;
+            }
+            .duel-segment {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                transition: height 0.3s;
+                font-size: 1.2em;
+                overflow: hidden;
+            }
+            .duel-home {
+                background-color: blue;
+            }
+            .duel-away {
+                background-color: red;
+            }
+            .scoreline-header {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+                font-size: 2em;
+                font-weight: bold;
+                margin: 20px 0;
+                font-family: monospace;
+            }
+            .scoreline-logo {
+                width: 60px;
+                height: 60px;
+                object-fit: contain;
+            }
+            .lineup-builder {
+                display: flex;
+                gap: 40px;
+                justify-content: center;
+                align-items: flex-start;
+                margin-top: 15px;
+                flex-wrap: wrap;
+            }
+            .lineup-side {
+                flex: 1;
+                min-width: 280px;
+                max-width: 520px;
+            }
+            .lineup-side h3 {
+                margin: 0 0 8px 0;
+                font-family: monospace;
+            }
+            .lineup-pitch {
+                background: #2d7a2d;
+                border: 3px solid #1a5c1a;
+                border-radius: 8px;
+                padding: 12px 8px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .lineup-row {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+            .lineup-row-label {
+                color: rgba(255,255,255,0.7);
+                font-size: 0.65em;
+                font-weight: bold;
+                font-family: monospace;
+                width: 30px;
+                text-align: center;
+                flex-shrink: 0;
+            }
+            .lineup-row-players {
+                display: flex;
+                gap: 5px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .player-select {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                opacity: 0;
+                cursor: pointer;
+                z-index: 2;
+            }
+            .player-slot {
+                position: relative;
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                background-color: #eee;
+                border: 2px solid #ccc;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                cursor: pointer;
+                font-size: 20px;
+                color: #aaa;
+                font-weight: bold;
+            }
+            .player-slot.invalid {
+                border-color: #cc0000;
+                background-color: #fff0f0;
+            }
+            .player-slot-img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                z-index: 1;
+            }
+            .player-select.invalid {
+                display: none;
+            }
+            .lineup-controls {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 8px;
+                flex-wrap: wrap;
+            }
+            .lineup-controls label {
+                font-family: monospace;
+                font-size: 0.9em;
+            }
+            .lineup-controls select {
+                font-family: monospace;
+                font-size: 0.9em;
+                padding: 2px 4px;
+            }
+            #custom_lineup_container {
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                padding: 15px;
+                background: #f9f9f9;
+                margin-top: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Tom's Match Engine</h1>
+        <br>
+        <div class="mode-toggle">
+            <button class="mode-btn active" id="mode_btn_game" onclick="setMode('game')">Individual Game</button>
+            <button class="mode-btn" id="mode_btn_group" onclick="setMode('group')">Group Sim</button>
+        </div>
+
+        <!-- ── Individual Game Panel ── -->
+        <div id="panel_game">
+        <label for="home_team_select">Home Team:</label>
+        <select id="home_team_select" onchange="syncDropdowns()"></select>
+        <br>
+        <label for="away_team_select">Away Team:</label>
+        <select id="away_team_select" onchange="syncDropdowns()"></select>
+        <br>
+        <label for="num_sims_input">Number of Sims:</label>
+        <input id="num_sims_input" type="number" value="1000" placeholder="e.g. 10000">
+        <br>
+        <label for="num_lineups_input">Number of Lineups Generated:</label>
+        <input id="num_lineups_input" type="number" value="1000" placeholder="e.g. 1000">
+        <br><br>
+        <label style="font-family: monospace;">
+            <input type="checkbox" id="custom_lineup_checkbox" onchange="toggleCustomLineup()"> Use Custom Lineups
+        </label>
+        <div id="custom_lineup_container" style="display: none;">
+            <label style="font-family: monospace; display: block; margin-bottom: 10px;">
+                <input type="checkbox" id="allow_oop_checkbox" onchange="toggleOOP()"> Allow Out of Position Players
+            </label>
+            <div class="lineup-builder">
+                <div class="lineup-side">
+                    <h3 id="home_lineup_title">Home Lineup</h3>
+                    <div class="lineup-controls">
+                        <label>Formation:
+                            <select id="home_formation_select" onchange="renderLineupBuilder('home')"></select>
+                        </label>
+                        <span id="home_lineup_status" style="font-family: monospace; font-size: 0.8em; color: #888;"></span>
+                    </div>
+                    <div class="lineup-pitch" id="home_lineup_rows"></div>
+                </div>
+                <div class="lineup-side">
+                    <h3 id="away_lineup_title">Away Lineup</h3>
+                    <div class="lineup-controls">
+                        <label>Formation:
+                            <select id="away_formation_select" onchange="renderLineupBuilder('away')"></select>
+                        </label>
+                        <span id="away_lineup_status" style="font-family: monospace; font-size: 0.8em; color: #888;"></span>
+                    </div>
+                    <div class="lineup-pitch" id="away_lineup_rows"></div>
+                </div>
+            </div>
+        </div>
+        <p id="warnings"> </p>
+        <button type="button" onclick="simulate()" id="sim_button">Simulate!</button>
+        </div><!-- end panel_game -->
+
+        <!-- ── Group Sim Panel ── -->
+        <div id="panel_group" style="display:none;" class="group-sim-controls">
+            <label for="group_select">Select Group:</label>
+            <select id="group_select"></select>
+            <br><br>
+            <label for="group_num_sims_input">Number of Sims:</label>
+            <input id="group_num_sims_input" type="number" value="1000" placeholder="e.g. 1000">
+            <br><br>
+            <p id="group_warnings"> </p>
+            <button type="button" onclick="simulateGroup()" id="group_sim_button">Simulate Group!</button>
+        </div>
+
+            <div id="results" style="margin-top: 20px; font-family: monospace; text-align: center;"></div>
+        <script>
+            const API_URL = "http://127.0.0.1:8000"
+
+            let global_teams_data = {};
+            let global_invalid_players = new Set();
+            async function populateTeamDropdowns() {
+                try {
+                    const response = await fetch(`${API_URL}/teams`)
+                    if (!response.ok) {
+                        throw new Error("Error while fetching data")
+                    }
+                    global_teams_data = await response.json()
+                    const sortedTeams = Object.entries(global_teams_data)
+                        .sort(([, a], [, b]) => a.name.localeCompare(b.name));
+
+                    const home_select = document.getElementById('home_team_select')
+                    const away_select = document.getElementById('away_team_select')
+
+                    sortedTeams.forEach(([id, team], index) => {
+                        const home_option = document.createElement('option')
+                        home_option.value = id
+                        home_option.textContent = team.name
+                        home_select.appendChild(home_option)
+
+                        const away_option = document.createElement('option')
+                        away_option.value = id
+                        away_option.textContent = team.name
+                        away_select.appendChild(away_option)
+                    })
+
+                    if (sortedTeams.length >= 2) {
+                        home_select.value = sortedTeams[0][0];
+                        away_select.value = sortedTeams[1][0];
+                    }
+                    
+                    syncDropdowns();
+                } catch (error) {
+                    console.error("Unable to load team data:", error)
+                }
+            }
+
+            function syncDropdowns() {
+                const home_select = document.getElementById('home_team_select');
+                const away_select = document.getElementById('away_team_select');
+                const home_val = home_select.value;
+                const away_val = away_select.value;
+
+                Array.from(home_select.options).forEach(opt => {
+                    opt.disabled = (opt.value === away_val);
+                });
+                Array.from(away_select.options).forEach(opt => {
+                    opt.disabled = (opt.value === home_val);
+                });
+
+                // Rebuild lineup builders if custom lineup is active
+                if (document.getElementById('custom_lineup_checkbox').checked && squads_bios_loaded) {
+                    renderLineupBuilder('home');
+                    renderLineupBuilder('away');
+                }
+            }
+
+            // ─── Lineup Builder ───────────────────────────────────────────────
+
+            const FORMATIONS = {
+                '4-3-3':   [3, 3, 4, 1],
+                '4-4-2':   [2, 4, 4, 1],
+                '4-2-3-1': [1, 3, 2, 4, 1],
+                '3-5-2':   [2, 5, 3, 1],
+                '3-4-3':   [3, 4, 3, 1],
+                '5-3-2':   [2, 3, 5, 1],
+                '4-5-1':   [1, 5, 4, 1],
+                '5-4-1':   [1, 4, 5, 1],
+                '4-1-4-1': [1, 4, 1, 4, 1],
+                '3-6-1':   [1, 6, 3, 1],
+            };
+
+            const POSITION_MAP = {
+                'G': 'GK',
+                'D': 'DEF',
+                'M': 'MID',
+                'F': 'FWD'
+            };
+
+            const ROW_LABELS = {
+                GK: 'GK', DEF: 'DEF', MID: 'MID', FWD: 'FWD', ATT: 'ATT'
+            };
+
+            function getRowLabel(rows, rowIndex) {
+                const n = rows.length;
+                if (rowIndex === n - 1) return 'GK';
+                if (rowIndex === n - 2) return 'DEF';
+                if (rowIndex === 0)     return 'FWD';
+                // middle rows — label by distance from GK end
+                if (rowIndex === 1)     return 'MID';
+                return 'MID';
+            }
+
+            let global_squads_data = {};
+            let global_bios_data_lineup = {};
+            let squads_bios_loaded = false;
+
+            function populateFormationSelects() {
+                ['home', 'away'].forEach(side => {
+                    const sel = document.getElementById(`${side}_formation_select`);
+                    if (!sel) return;
+                    sel.innerHTML = '';
+                    Object.keys(FORMATIONS).forEach(f => {
+                        const opt = document.createElement('option');
+                        opt.value = f;
+                        opt.textContent = f;
+                        sel.appendChild(opt);
+                    });
+                });
+            }
+
+            async function loadSquadsAndBios() {
+                if (squads_bios_loaded) return;
+                const warnings = document.getElementById('warnings');
+                warnings.textContent = 'Loading squad data…';
+                const [squadsRes, biosRes] = await Promise.all([
+                    fetch(`${API_URL}/squads`),
+                    fetch(`${API_URL}/player_bios`)
+                ]);
+                if (!squadsRes.ok || !biosRes.ok) throw new Error('Failed to fetch squads or bios');
+                global_squads_data = await squadsRes.json();
+                global_bios_data_lineup = await biosRes.json();
+                squads_bios_loaded = true;
+                warnings.textContent = ' ';
+            }
+
+            async function toggleCustomLineup() {
+                const checkbox = document.getElementById('custom_lineup_checkbox');
+                const container = document.getElementById('custom_lineup_container');
+                const numLineupsInput = document.getElementById('num_lineups_input');
+                if (!checkbox.checked) {
+                    container.style.display = 'none';
+                    numLineupsInput.disabled = false;
+                    return;
+                }
+                container.style.display = 'block';
+                numLineupsInput.value = 1;
+                numLineupsInput.disabled = true;
+                populateFormationSelects();
+                try {
+                    await loadSquadsAndBios();
+                    renderLineupBuilder('home');
+                    renderLineupBuilder('away');
+                } catch (e) {
+                    console.error('Failed to load squad data:', e);
+                    document.getElementById('warnings').textContent = 'Error loading squad data. Is the server running?';
+                }
+            }
+
+            function updateSlotImage(side, rowIndex, playerIndex) {
+                const sel = document.getElementById(`${side}_r${rowIndex}_p${playerIndex}`);
+                const img = document.getElementById(`${side}_img_${rowIndex}_${playerIndex}`);
+                if (!sel || !img) return;
+                const playerId = sel.value;
+                if (playerId) {
+                    img.src = global_bios_data_lineup[playerId]?.img_path || '';
+                    img.style.display = 'block';
+                } else {
+                    img.src = '';
+                    img.style.display = 'none';
+                }
+            }
+
+            function toggleOOP() {
+                renderLineupBuilder('home');
+                renderLineupBuilder('away');
+            }
+
+            function renderLineupBuilder(side) {
+                const teamId  = document.getElementById(`${side}_team_select`).value;
+                const teamName = global_teams_data[teamId]?.name || (side === 'home' ? 'Home' : 'Away');
+                document.getElementById(`${side}_lineup_title`).textContent = `${teamName} Lineup`;
+
+                const formation = document.getElementById(`${side}_formation_select`).value;
+                const rows = FORMATIONS[formation];
+                const squad = global_squads_data[teamId] || [];
+
+                 // Sort squad: GK first, then DEF, MID, FWD, then alphabetical
+                 const posOrder = { GK: 0, DEF: 1, MID: 2, FWD: 3 };
+                 const sortedSquad = [...squad].sort((a, b) => {
+                     const pa = posOrder[POSITION_MAP[global_bios_data_lineup[a]?.base_position]] ?? 9;
+                     const pb = posOrder[POSITION_MAP[global_bios_data_lineup[b]?.base_position]] ?? 9;
+                     if (pa !== pb) return pa - pb;
+                     return (global_bios_data_lineup[a]?.name || '').localeCompare(global_bios_data_lineup[b]?.name || '');
+                 });
+
+                const container = document.getElementById(`${side}_lineup_rows`);
+                container.innerHTML = '';
+
+                rows.forEach((count, rowIndex) => {
+                    const label = getRowLabel(rows, rowIndex);
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'lineup-row';
+
+                    const labelDiv = document.createElement('div');
+                    labelDiv.className = 'lineup-row-label';
+                    labelDiv.textContent = label;
+                    rowDiv.appendChild(labelDiv);
+
+                    const playersDiv = document.createElement('div');
+                    playersDiv.className = 'lineup-row-players';
+                    playersDiv.id = `${side}_row_${rowIndex}_players`;
+                    rowDiv.appendChild(playersDiv);
+
+                    container.appendChild(rowDiv);
+
+                     // Only show players whose position matches this row, unless OOP is allowed
+                     const allowOOP = document.getElementById('allow_oop_checkbox').checked;
+                     const filteredSquad = sortedSquad.filter(playerId => {
+                         if (allowOOP) return true;
+                         const pos = POSITION_MAP[global_bios_data_lineup[playerId]?.base_position];
+                         return pos === label;
+                     });
+
+                     for (let i = 0; i < count; i++) {
+                         const slot = document.createElement('div');
+                         slot.className = 'player-slot';
+                         slot.textContent = '+';
+
+                         const img = document.createElement('img');
+                         img.className = 'player-slot-img';
+                         img.id = `${side}_img_${rowIndex}_${i}`;
+                         img.style.display = 'none';
+                         slot.appendChild(img);
+
+                         const sel = document.createElement('select');
+                         sel.className = 'player-select';
+                         sel.id = `${side}_r${rowIndex}_p${i}`;
+                         sel.onchange = () => {
+                             refreshPlayerSelectOptions(side);
+                             updateSlotImage(side, rowIndex, i);
+                         };
+
+                         const blank = document.createElement('option');
+                         blank.value = '';
+                         blank.textContent = '— pick —';
+                         sel.appendChild(blank);
+
+                         filteredSquad.forEach(playerId => {
+                             const bio = global_bios_data_lineup[playerId];
+                             if (!bio) return;
+                             const opt = document.createElement('option');
+                             opt.value = playerId;
+                             opt.textContent = bio.name;
+                             sel.appendChild(opt);
+                         });
+
+                         slot.appendChild(sel);
+                         playersDiv.appendChild(slot);
+                     }
+                });
+
+                refreshPlayerSelectOptions(side);
+            }
+
+            function getAllLineupSelects(side) {
+                return Array.from(document.querySelectorAll(`[id^="${side}_r"][id*="_p"]`));
+            }
+
+            function refreshPlayerSelectOptions(side) {
+                const selects = getAllLineupSelects(side);
+                if (!selects) return;
+                const chosenIds = new Set(selects.map(s => s?.value).filter(v => v && v !== ''));
+ 
+                    selects.forEach(sel => {
+                        if (!sel) return;
+                        const current = sel.value;
+                        const options = sel.options || [];
+                        Array.from(options).forEach(opt => {
+                            if (!opt) return;
+                            if (opt.value === '' || opt.value === current) {
+                                opt.disabled = false;
+                            } else {
+                                opt.disabled = chosenIds.has(opt.value);
+                            }
+                        });
+                        const slot = sel.parentElement;
+                        if (slot) {
+                            slot.classList.toggle('invalid', current === '' || global_invalid_players.has(current));
+                        }
+                    });
+ 
+                updateLineupStatus(side);
+            }
+
+            function updateLineupStatus(side) {
+                const selects = getAllLineupSelects(side);
+                const filled = selects.filter(s => s.value !== '').length;
+                const total  = selects.length;
+                const statusEl = document.getElementById(`${side}_lineup_status`);
+                if (!statusEl) return;
+                statusEl.textContent = `${filled}/${total} selected`;
+                statusEl.style.color = filled === total ? '#2d7a2d' : '#888';
+            }
+
+            function getLineup(side) {
+                const formation = document.getElementById(`${side}_formation_select`).value;
+                const rows = FORMATIONS[formation];
+                return rows.map((count, rowIndex) => {
+                    const row = [];
+                    for (let i = 0; i < count; i++) {
+                        const sel = document.getElementById(`${side}_r${rowIndex}_p${i}`);
+                        row.push(sel ? parseInt(sel.value) : null);
+                    }
+                    return row;
+                });
+            }
+
+            function validateLineup(side, lineup) {
+                const flat = lineup.flat();
+                if (flat.some(id => !id || isNaN(id))) {
+                    const teamName = document.getElementById(`${side}_lineup_title`).textContent;
+                    return `${teamName}: please select all 11 players.`;
+                }
+                const unique = new Set(flat);
+                if (unique.size !== flat.length) {
+                    const teamName = document.getElementById(`${side}_lineup_title`).textContent;
+                    return `${teamName}: duplicate players detected.`;
+                }
+                if (flat.length !== 11) {
+                    const teamName = document.getElementById(`${side}_lineup_title`).textContent;
+                    return `${teamName}: lineup must contain exactly 11 players (got ${flat.length}).`;
+                }
+                return null;
+            }
+
+            function isTooLight(color) {
+                if (!color || typeof color !== 'string') return false;
+                if (color.startsWith('#')) {
+                    const r = parseInt(color.slice(1, 3), 16);
+                    const g = parseInt(color.slice(3, 5), 16);
+                    const b = parseInt(color.slice(5, 7), 16);
+                    return (0.299 * r + 0.587 * g + 0.114 * b) > 180;
+                }
+                return false;
+            }
+
+            function getColorDistance(color1, color2) {
+                const parse = (c) => {
+                    if (c && c.startsWith('#')) {
+                        const r = parseInt(c.slice(1, 3), 16);
+                        const g = parseInt(c.slice(3, 5), 16);
+                        const b = parseInt(c.slice(5, 7), 16);
+                        return [r, g, b];
+                    }
+                    return [0, 0, 0];
+                };
+                const [r1, g1, b1] = parse(color1);
+                const [r2, g2, b2] = parse(color2);
+                return Math.sqrt(Math.pow(r1 - r2, 2) + Math.pow(g1 - g2, 2) + Math.pow(b1 - b2, 2));
+            }
+
+            async function simulate(){
+                const home_select = document.getElementById('home_team_select')
+                const away_select = document.getElementById('away_team_select')
+                const num_sims_input = document.getElementById('num_sims_input')
+                const num_lineups_input = document.getElementById('num_lineups_input')
+                const warnings = document.getElementById("warnings")
+                const results_div = document.getElementById("results")
+                const sim_button = document.getElementById('sim_button')
+
+                const home_id = home_select.value
+                const away_id = away_select.value
+                
+                const home_color = global_teams_data[home_id]?.primary_color || 'blue';
+                const away_color = global_teams_data[away_id]?.primary_color || 'red';
+                const home_secondary = global_teams_data[home_id]?.secondary_color || 'white';
+                const away_secondary = global_teams_data[away_id]?.secondary_color || 'white';
+
+                let effective_home_color = isTooLight(home_color) ? home_secondary : home_color;
+                let effective_away_color = isTooLight(away_color) ? away_secondary : away_color;
+
+                if (getColorDistance(effective_home_color, effective_away_color) < 50) {
+                    const away_sec = global_teams_data[away_id]?.secondary_color || 'white';
+                    if (away_sec.toLowerCase() === '#ffffff' || isTooLight(away_sec)) {
+                        effective_away_color = global_teams_data[home_id]?.secondary_color || 'white';
+                    } else {
+                        effective_away_color = away_sec;
+                    }
+                }
+
+                const num_sims = num_sims_input.value
+                const num_lineups = num_lineups_input.value
+                    const use_custom_lineup = document.getElementById('custom_lineup_checkbox').checked;
+ 
+                    results_div.innerHTML = "";
+                    global_invalid_players.clear();
+
+                if (home_id == away_id){
+                    warnings.textContent = "Home and away teams cannot be the same";
+                    return;
+                } else if (num_sims == ''){
+                    warnings.textContent = "Please enter a valid number of simulations";
+                    return;
+                } else if (num_lineups == ''){
+                    warnings.textContent = "Please enter a valid number of lineups";
+                    return;
+                } else if (parseInt(num_lineups) > parseInt(num_sims)){
+                    warnings.textContent = "Number of lineups cannot be greater than number of sims";
+                    return;
+                }
+
+                 let home_lineup = [];
+                 let away_lineup = [];
+
+                if (use_custom_lineup) {
+                    home_lineup = getLineup('home');
+                    away_lineup = getLineup('away');
+                    const homeErr = validateLineup('home', home_lineup);
+                    if (homeErr) { warnings.textContent = homeErr; return; }
+                    const awayErr = validateLineup('away', away_lineup);
+                    if (awayErr) { warnings.textContent = awayErr; return; }
+                }
+
+                sim_button.disabled = true
+                warnings.textContent = "Simulating..."
+
+                try {
+                    const response = await fetch(`${API_URL}/sim`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            home_id: home_id,
+                            away_id: away_id,
+                            num_sims: num_sims,
+                            num_lineups: num_lineups,
+                            custom_lineup: use_custom_lineup,
+                            home_lineup: home_lineup,
+                            away_lineup: away_lineup
+                        })
+                    });
+
+                      if (!response.ok){
+                          if (response.status === 404) {
+                              const errorData = await response.json();
+                              const invalidHome = errorData.detail?.invalid_home || [];
+                              const invalidAway = errorData.detail?.invalid_away || [];
+                              const invalidIds = [...invalidHome, ...invalidAway];
+                              
+                              if (invalidIds.length > 0) {
+                                  invalidIds.forEach(id => global_invalid_players.add(id.toString()));
+                                  const names = invalidIds.map(id => global_bios_data_lineup[id]?.name || `ID ${id}`);
+                                  warnings.textContent = `One or more players were not found: ${names.join(', ')}`;
+                                  
+                                  // Trigger UI refresh for both sides
+                                  refreshPlayerSelectOptions('home');
+                                  refreshPlayerSelectOptions('away');
+                                  
+                                  sim_button.disabled = false;
+                                  return;
+                              }
+                              
+                              const msg = errorData.detail?.message || 'One or more players were not found';
+                              throw new Error(msg);
+                          }
+                          throw new Error(`HTTP error! Status: ${response.status}`);
+                      }
+
+                    const data = await response.json();
+                    
+                    const metrics_response = await fetch(`${API_URL}/sim_metrics`);
+                    const metrics_data = await metrics_response.json();
+
+                    const bios_response = await fetch(`${API_URL}/player_bios`);
+                    const bios_data = await bios_response.json();
+                    
+                    const home_team_name = global_teams_data[home_id]?.name || 'Home';
+                    const away_team_name = global_teams_data[away_id]?.name || 'Away';
+
+                    const total_sims = parseInt(num_sims);
+                    const home_win_prob = ((data.home_wins / total_sims) * 100).toFixed(2);
+                    const away_win_prob = ((data.away_wins / total_sims) * 100).toFixed(2);
+                    const draw_prob = ((data.draws / total_sims) * 100).toFixed(2);
+                     const home_avg_goals = (data.home_goals / total_sims).toFixed(2);
+                     const away_avg_goals = (data.away_goals / total_sims).toFixed(2);
+ 
+                     const home_logo = global_teams_data[home_id]?.img_path || '';
+                     const away_logo = global_teams_data[away_id]?.img_path || '';
+ 
+                      // Moved results_html assignment below processLineups and metrics calculation
+                      const processLineups = (side) => {
+                          const team_name = side === 'home' ? home_team_name : away_team_name;
+                          const lineups = metrics_data.lineups[side];
+                          const sortedPlayers = Object.entries(lineups)
+                              .sort(([, a], [, b]) => b - a);
+                          
+                           const maxFreq = sortedPlayers.length > 0 ? sortedPlayers[0][1] : 1;
+                           const bar_color = side === 'home' ? effective_home_color : effective_away_color;
+                           
+                           let histogram_html = `<h4>${team_name} Histogram</h4>`;
+                          let table_html = `<h4>${team_name} Table</h4>
+                              <table>
+                                  <thead>
+                                      <tr><th>Player Name</th><th>Regular Position</th><th>% in Lineup</th></tr>
+                                  </thead>
+                                  <tbody>`;
+                          
+                          sortedPlayers.forEach(([id, freq]) => {
+                              const player = bios_data[id] || { name: "Unknown", base_position: "Unknown" };
+                              const percentage = ((freq / total_sims) * 100).toFixed(2);
+                              const barWidth = (freq / maxFreq) * 100;
+                              
+                              histogram_html += `
+                                  <div class="bar-container">
+                                      <div class="bar-label">${player.name}</div>
+                                      <div class="bar-outer">
+                                          <div class="bar-inner" style="width: ${barWidth}%; background-color: ${bar_color}"></div>
+                                      </div>
+                                      <div style="margin-left: 10px">${freq}</div>
+                                  </div>`;
+                              
+                              table_html += `
+                                  <tr>
+                                      <td>${player.name}</td>
+                                      <td>${player.base_position}</td>
+                                      <td>${percentage}%</td>
+                                  </tr>`;
+                          });
+                          
+                          table_html += `</tbody></table>`;
+                          return { histogram_html, table_html };
+                      };
+
+                      const home_metrics = processLineups('home');
+                      const away_metrics = processLineups('away');
+
+                      let results_html = `
+                          <div class="scoreline-header">
+                              ${home_logo ? `<img src="${home_logo}" class="scoreline-logo">` : ''}
+                              <span>${home_avg_goals} - ${away_avg_goals}</span>
+                              ${away_logo ? `<img src="${away_logo}" class="scoreline-logo">` : ''}
+                          </div>
+                          <details open>
+                              <summary>Base Metrics</summary>
+                              <div class="metrics-row">
+                                  <div class="metrics-col">
+                                      <h4>Raw Stats</h4>
+                                      <p>${home_team_name} Wins: ${data.home_wins}</p>
+                                      <p>${away_team_name} Wins: ${data.away_wins}</p>
+                                      <p>Draws: ${data.draws}</p>
+                                      <p>${home_team_name} Goals: ${data.home_goals}</p>
+                                      <p>${away_team_name} Goals: ${data.away_goals}</p>
+                                  </div>
+                                  <div class="metrics-col">
+                                      <h4>Detailed Stats</h4>
+                                      <p>${home_team_name} Win Probability: ${home_win_prob}%</p>
+                                      <p>${away_team_name} Win Probability: ${away_win_prob}%</p>
+                                      <p>Draw Probability: ${draw_prob}%</p>
+                                      <p>Average Scoreline: ${home_avg_goals} - ${away_avg_goals}</p>
+                                  </div>
+                              </div>
+                          </details>
+                          
+                          ${!use_custom_lineup ? `
+                          <details open>
+                              <summary>Lineup Frequency</summary>
+                              <div class="metrics-row">
+                                  <div class="metrics-col">${home_metrics.histogram_html}</div>
+                                  <div class="metrics-col">${away_metrics.histogram_html}</div>
+                                  <div class="metrics-col">${home_metrics.table_html}</div>
+                                  <div class="metrics-col">${away_metrics.table_html}</div>
+                              </div>
+                          </details>
+                          ` : ''}
+                      `;
+
+                    // This part was edited by the previous tool call but I need to make sure renderDuelThird is defined.
+                    // I will add the renderDuelThird function and the team duels HTML.
+                    
+                    const processPlayerDuels = (zone) => {
+                        const duels = metrics_data.duels[zone];
+                        if (!duels) return `<h4>${zone}</h4><p>No data available</p>`;
+                        
+                        const sortedPlayers = Object.entries(duels)
+                            .sort(([, a], [, b]) => b - a);
+                        
+                        const maxFreq = sortedPlayers.length > 0 ? sortedPlayers[0][1] : 1;
+                        
+                        let zoneName = zone;
+                        if (zone === 'home_defense') zoneName = `${home_team_name} Defensive`;
+                        else if (zone === 'away_defense') zoneName = `${away_team_name} Defensive`;
+                        else if (zone === 'midfield') zoneName = 'Midfield';
+
+                        let html = `<h4>${zoneName}</h4>`;
+                        sortedPlayers.forEach(([id, freq]) => {
+                            const player = bios_data[id] || { name: "Unknown" };
+                            
+                             // Determine team and color
+                             let bar_color = '#ccc';
+                             if (metrics_data.lineups.home[id]) {
+                                 bar_color = effective_home_color;
+                             } else if (metrics_data.lineups.away[id]) {
+                                 bar_color = effective_away_color;
+                             }
+
+                            const barWidth = (freq / maxFreq) * 100;
+                            html += `
+                                <div class="bar-container">
+                                    <div class="bar-label">${player.name}</div>
+                                    <div class="bar-outer">
+                                        <div class="bar-inner" style="width: ${barWidth}%; background-color: ${bar_color}"></div>
+                                    </div>
+                                    <div style="margin-left: 10px">${freq}</div>
+                                </div>`;
+                        });
+                        return html;
+                    };
+
+                    const home_def_duels = processPlayerDuels('home_defense');
+                    const mid_duels = processPlayerDuels('midfield');
+                    const away_def_duels = processPlayerDuels('away_defense');
+
+                        const processAttackingMetrics = () => {
+                            const all_goals = { ...metrics_data.goals.home, ...metrics_data.goals.away };
+                            const players = Object.entries(all_goals).map(([id, stats]) => ({
+                                id,
+                                name: bios_data[id]?.name || 'Unknown',
+                                goals: stats.goals,
+                                sog: stats.sog,
+                                pct: stats.sog > 0 ? (stats.goals / stats.sog) * 100 : 0
+                            }));
+
+                             const getPlayerColor = (playerId) => {
+                                 if (metrics_data.lineups.home[playerId]) return effective_home_color;
+                                 if (metrics_data.lineups.away[playerId]) return effective_away_color;
+                                 return '#ccc';
+                             };
+
+                            const getPlayerNation = (playerId) => {
+                                let teamId;
+                                if (metrics_data.lineups.home[playerId]) {
+                                    teamId = home_id;
+                                } else if (metrics_data.lineups.away[playerId]) {
+                                    teamId = away_id;
+                                } else {
+                                    return 'UNK';
+                                }
+                                const teamName = global_teams_data[teamId]?.name || 'UNK';
+                                return teamName.substring(0, 3).toUpperCase();
+                            };
+
+                            const formatPodiumName = (name) => {
+                                if (!name) return 'Unknown';
+                                if (name.length <= 12) return name;
+                                const parts = name.split(' ');
+                                if (parts.length > 1) {
+                                    return `${parts[0][0]}. ${parts.slice(1).join(' ')}`;
+                                }
+                                return name;
+                            };
+
+                            const getPodiumHtml = (sortedList, labelKey, labelValue) => {
+                                const top3 = sortedList.slice(0, 3);
+                                const others = sortedList.slice(3, 10);
+
+                                const formatMetric = (p) => {
+                                    if (labelKey === 'pct') {
+                                        return `${p[labelKey].toFixed(2)}% (${p.goals}/${p.sog})`;
+                                    }
+                                    return `${p[labelKey]} ${labelValue}`;
+                                };
+                                
+                                let podium_html = `<div class="podium-container">`;
+                                
+                                 // 2nd Place
+                                 if (top3[1]) {
+                                     const bar_color = getPlayerColor(top3[1].id);
+                                     const text_color = isTooLight(bar_color) ? '#000' : '#fff';
+                                     const img_path = bios_data[top3[1].id]?.img_path || '';
+                                     podium_html += `
+                                         <div class="podium-place">
+                                             ${img_path ? `<img src="${img_path}" class="podium-img">` : ''}
+                                             <div class="podium-name">${formatPodiumName(top3[1].name)}</div>
+                                             <div style="font-size: 0.7em; margin-bottom: 5px; text-align: center;">${formatMetric(top3[1])}</div>
+                                             <div class="podium-bar" style="height: 80px; background-color: ${bar_color}; color: ${text_color};">2</div>
+                                         </div>`;
+                                 } else {
+                                    podium_html += `<div class="podium-place" style="width: 90px"></div>`;
+                                }
+                                
+                                 // 1st Place
+                                 if (top3[0]) {
+                                     const bar_color = getPlayerColor(top3[0].id);
+                                     const text_color = isTooLight(bar_color) ? '#000' : '#fff';
+                                     const img_path = bios_data[top3[0].id]?.img_path || '';
+                                     podium_html += `
+                                         <div class="podium-place">
+                                             ${img_path ? `<img src="${img_path}" class="podium-img">` : ''}
+                                             <div class="podium-name">${formatPodiumName(top3[0].name)}</div>
+                                             <div style="font-size: 0.7em; margin-bottom: 5px; text-align: center;">${formatMetric(top3[0])}</div>
+                                             <div class="podium-bar" style="height: 130px; background-color: ${bar_color}; color: ${text_color};">1</div>
+                                         </div>`;
+                                 } else {
+                                    podium_html += `<div class="podium-place" style="width: 90px"></div>`;
+                                }
+                                
+                                 // 3rd Place
+                                 if (top3[2]) {
+                                     const bar_color = getPlayerColor(top3[2].id);
+                                     const text_color = isTooLight(bar_color) ? '#000' : '#fff';
+                                     const img_path = bios_data[top3[2].id]?.img_path || '';
+                                     podium_html += `
+                                         <div class="podium-place">
+                                             ${img_path ? `<img src="${img_path}" class="podium-img">` : ''}
+                                             <div class="podium-name">${formatPodiumName(top3[2].name)}</div>
+                                             <div style="font-size: 0.7em; margin-bottom: 5px; text-align: center;">${formatMetric(top3[2])}</div>
+                                             <div class="podium-bar" style="height: 60px; background-color: ${bar_color}; color: ${text_color};">3</div>
+                                         </div>`;
+                                 } else {
+                                    podium_html += `<div class="podium-place" style="width: 90px"></div>`;
+                                }
+                                
+                                podium_html += `</div>`;
+                                
+                                let list_html = `<ul>`;
+                                others.forEach((p, i) => {
+                                    list_html += `<li>${i + 4}. ${p.name} (${getPlayerNation(p.id)})<br><span style="margin-left: 20px;">- ${formatMetric(p)}</span></li>`;
+                                });
+                                list_html += `</ul>`;
+                                
+                                return { podium_html, list_html };
+                            };
+
+                        const top_scorers = [...players].sort((a, b) => b.goals - a.goals);
+                        const top_pct = [...players].sort((a, b) => b.pct - a.pct);
+
+                        const scorers_res = getPodiumHtml(top_scorers, 'goals', 'Goals');
+                        const pct_res = getPodiumHtml(top_pct, 'pct', '%');
+
+                        return `
+                            <div class="top-metrics-container">
+                                <div class="top-metric-section">
+                                    <h4>Top Scorers</h4>
+                                    <div class="podium-wrapper">
+                                        ${scorers_res.podium_html}
+                                        ${scorers_res.list_html}
+                                    </div>
+                                </div>
+                                <div class="top-metric-section">
+                                    <h4>Shot Efficiency</h4>
+                                    <div class="podium-wrapper">
+                                        ${pct_res.podium_html}
+                                        ${pct_res.list_html}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    };
+
+                    const attacking_metrics_html = processAttackingMetrics();
+
+                    results_html += `
+                        <details open>
+                            <summary>Attacking Metrics</summary>
+                            ${attacking_metrics_html}
+                        </details>
+                    `;
+
+                     const home_color = global_teams_data[home_id]?.primary_color || 'blue';
+                     const away_color = global_teams_data[away_id]?.primary_color || 'red';
+                     const home_secondary = global_teams_data[home_id]?.secondary_color || 'white';
+                      results_html += `
+                          <details open>
+                              <summary>Player Duels</summary>
+                            <div class="metrics-row">
+                                <div class="metrics-col">${home_def_duels}</div>
+                                <div class="metrics-col">${mid_duels}</div>
+                                <div class="metrics-col">${away_def_duels}</div>
+                                <div class="metrics-col" style="display: flex; flex-direction: column; justify-content: center; gap: 10px; font-family: monospace; font-weight: bold;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div style="width: 20px; height: 20px; background-color: ${effective_home_color}; border: 1px solid #000;"></div>
+                                        <span>${home_team_name}</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div style="width: 20px; height: 20px; background-color: ${effective_away_color}; border: 1px solid #000;"></div>
+                                        <span>${away_team_name}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </details>
+                    `;
+
+                    results_html += `
+                        <details open>
+                            <summary>Team Duels</summary>
+                            <div style="display: flex; justify-content: space-around; width: 600px; margin: 10px auto 0; font-weight: bold; font-family: monospace;">
+                                <div style="width: 200px; text-align: center;">${home_team_name} Defensive</div>
+                                <div style="width: 200px; text-align: center;">Midfield</div>
+                                <div style="width: 200px; text-align: center;">${away_team_name} Defensive</div>
+                            </div>
+                            <div class="duel-container">
+                                 ${renderDuelThird('home_defense', metrics_data.team_duels, effective_home_color, home_secondary, effective_away_color, away_secondary)}
+                                 ${renderDuelThird('midfield', metrics_data.team_duels, effective_home_color, home_secondary, effective_away_color, away_secondary)}
+                                 ${renderDuelThird('away_defense', metrics_data.team_duels, effective_home_color, home_secondary, effective_away_color, away_secondary)}
+                                 </div>
+                                 <div style="display: flex; justify-content: center; gap: 30px; margin-top: 15px; font-family: monospace; font-weight: bold;">
+                                     <div style="display: flex; align-items: center; gap: 8px;">
+                                         <div style="width: 20px; height: 20px; background-color: ${effective_home_color}; border: 1px solid #000;"></div>
+                                         <span>${home_team_name}</span>
+                                     </div>
+                                     <div style="display: flex; align-items: center; gap: 8px;">
+                                         <div style="width: 20px; height: 20px; background-color: ${effective_away_color}; border: 1px solid #000;"></div>
+                                         <span>${away_team_name}</span>
+                                     </div>
+                                 </div>
+                             </details>
+                             `;
+
+                    results_div.innerHTML = results_html;
+                    warnings.textContent = "Simulation complete!";
+                } catch (error){
+                    console.error('Error while trying to simulate:', error);
+                    warnings.textContent = "Error during simulation. See console.";
+                } finally {
+                    sim_button.disabled = false
+                }
+            }
+
+            // ── Mode Toggle ──────────────────────────────────────────────────
+            function setMode(mode) {
+                document.getElementById('panel_game').style.display  = mode === 'game'  ? '' : 'none';
+                document.getElementById('panel_group').style.display = mode === 'group' ? '' : 'none';
+                document.getElementById('mode_btn_game').classList.toggle('active',  mode === 'game');
+                document.getElementById('mode_btn_group').classList.toggle('active', mode === 'group');
+                document.getElementById('results').innerHTML = '';
+            }
+
+            // ── Group Sim ────────────────────────────────────────────────────
+            const GROUPS_DATA = {"Group A":3954,"Group B":3955,"Group C":3956,"Group D":3957,"Group E":3958,"Group F":3959,"Group G":3960,"Group H":3961,"Group I":139403,"Group J":139404,"Group K":139405,"Group L":139406};
+
+            populateTeamDropdowns();
+            populateGroupDropdown();
+
+            function populateGroupDropdown() {
+                const sel = document.getElementById('group_select');
+                Object.entries(GROUPS_DATA).forEach(([name, id]) => {
+                    const opt = document.createElement('option');
+                    opt.value = id;
+                    opt.textContent = name;
+                    sel.appendChild(opt);
+                });
+            }
+
+            async function simulateGroup() {
+                const group_id = document.getElementById('group_select').value;
+                const num_sims = document.getElementById('group_num_sims_input').value || 1000;
+                const warnings = document.getElementById('group_warnings');
+                const results_div = document.getElementById('results');
+                const btn = document.getElementById('group_sim_button');
+
+                if (!num_sims || parseInt(num_sims) < 1) {
+                    warnings.textContent = 'Please enter a valid number of simulations.';
+                    return;
+                }
+
+                btn.disabled = true;
+                warnings.textContent = 'Simulating group…';
+                results_div.innerHTML = '';
+
+                try {
+                    const res = await fetch(`${API_URL}/sim_group/${group_id}?num_sims=${num_sims}`);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+
+                    // data.standings: { team_id: { points, gd } }
+                    // data.game_log:  { "homeid_awayid": { home_goals, away_goals } }
+
+                    // Sort standings by points desc, then gd desc
+                    const sorted = Object.entries(data.standings)
+                        .sort(([, a], [, b]) => b.points - a.points || b.gd - a.gd);
+
+                    // ── Standings Table ──
+                    let standings_html = `
+                        <h3>Group Standings</h3>
+                        <table class="group-standings-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th colspan="2">Nation</th>
+                                    <th>GD</th>
+                                    <th>Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
+                    sorted.forEach(([team_id, stat], idx) => {
+                        const team = global_teams_data[team_id] || {};
+                        const logo = team.img_path || '';
+                        const name = team.name || `Team ${team_id}`;
+                        const gd   = stat.gd >= 0 ? `+${stat.gd.toFixed(2)}` : stat.gd.toFixed(2);
+                        const pts  = stat.points.toFixed(2);
+                        standings_html += `
+                            <tr>
+                                <td>${idx + 1}</td>
+                                <td>${logo ? `<img src="${logo}" class="nation-logo-sm">` : ''}</td>
+                                <td>${name}</td>
+                                <td>${gd}</td>
+                                <td>${pts}</td>
+                            </tr>`;
+                    });
+
+                    standings_html += `</tbody></table>`;
+
+                    // ── Game Log ──
+                    let games_html = `<h3>Match Results</h3><div class="game-log-grid">`;
+
+                    Object.entries(data.game_log).forEach(([key, score]) => {
+                        // key is "homeid_awayid" — split on underscore
+                        const parts = key.match(/^(\d+)(\d{4})$/) || null;
+                        // IDs are 4 digits each based on sample (4781, 4736 etc)
+                        // Use a smarter split: try all split points
+                        let home_id = null, away_id = null;
+                        // Find the split by checking which sub-strings exist in teams data
+                        const k = key;
+                        for (let i = 1; i < k.length; i++) {
+                            const h = k.slice(0, i);
+                            const a = k.slice(i);
+                            if (global_teams_data[h] && global_teams_data[a]) {
+                                home_id = h; away_id = a; break;
+                            }
+                        }
+                        if (!home_id) {
+                            // fallback: split in half
+                            home_id = k.slice(0, Math.floor(k.length / 2));
+                            away_id = k.slice(Math.floor(k.length / 2));
+                        }
+
+                        const home_team = global_teams_data[home_id] || {};
+                        const away_team = global_teams_data[away_id] || {};
+                        const home_logo = home_team.img_path || '';
+                        const away_logo = away_team.img_path || '';
+                        const home_name = home_team.name || `Team ${home_id}`;
+                        const away_name = away_team.name || `Team ${away_id}`;
+                        const h_goals = score.home_goals.toFixed(2);
+                        const a_goals = score.away_goals.toFixed(2);
+
+                        games_html += `
+                            <div class="game-log-row">
+                                <div class="game-log-team">
+                                    ${home_logo ? `<img src="${home_logo}" class="nation-logo-sm">` : ''}
+                                    <span>${home_name}</span>
+                                </div>
+                                <div class="game-log-score">${h_goals} – ${a_goals}</div>
+                                <div class="game-log-team away">
+                                    ${away_logo ? `<img src="${away_logo}" class="nation-logo-sm">` : ''}
+                                    <span>${away_name}</span>
+                                </div>
+                            </div>`;
+                    });
+
+                    games_html += `</div>`;
+
+                    results_div.innerHTML = standings_html + games_html;
+                    warnings.textContent = 'Simulation complete!';
+                } catch (err) {
+                    console.error('Group sim error:', err);
+                    warnings.textContent = 'Error during group simulation. See console.';
+                } finally {
+                    btn.disabled = false;
+                }
+            }
+
+                function renderDuelThird(zone, team_duels, homePrimary, homeSecondary, awayPrimary, awaySecondary) {
+                    if (!team_duels || !team_duels[zone]) {
+                        return `<div class="duel-third" style="background: #eee; color: #000; display: flex; align-items: center; justify-content: center;">No Data</div>`;
+                    }
+                    const home_pct = (team_duels[zone].home?.win_pct || 0) * 100;
+                    const home_pct_display = home_pct.toFixed(2);
+                    const away_pct_display = (100 - parseFloat(home_pct_display)).toFixed(2);
+                    
+                    const eff_home_color = homePrimary;
+                    const eff_home_text = (homePrimary === homeSecondary) ? '#fff' : homeSecondary;
+                    
+                    const eff_away_color = awayPrimary;
+                    const eff_away_text = (awayPrimary === awaySecondary) ? '#fff' : awaySecondary;
+ 
+                    return `
+                        <div class="duel-third">
+                            <div class="duel-segment" style="height: ${home_pct}%; background-color: ${eff_home_color}; color: ${eff_home_text}">${home_pct > 10 ? `<span style="background-color: ${eff_home_color}; padding: 0 4px;">${home_pct_display + '%'}</span>` : ''}</div>
+                            <div class="duel-segment" style="height: ${100 - home_pct}%; background-color: ${eff_away_color}; color: ${eff_away_text}">${ (100 - home_pct) > 10 ? `<span style="background-color: ${eff_away_color}; padding: 0 4px;">${away_pct_display + '%'}</span>` : ''}</div>
+                        </div>
+                    `;
+                }
+        </script>
+    </body>
+</html>
