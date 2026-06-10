@@ -1,0 +1,314 @@
+{
+  "3954": [
+    {
+      "home_id": 4781,
+      "away_id": 4736
+    },
+    {
+      "home_id": 4735,
+      "away_id": 4714
+    },
+    {
+      "home_id": 4714,
+      "away_id": 4736
+    },
+    {
+      "home_id": 4781,
+      "away_id": 4735
+    },
+    {
+      "home_id": 4714,
+      "away_id": 4781
+    },
+    {
+      "home_id": 4736,
+      "away_id": 4735
+    }
+  ],
+  "3955": [
+    {
+      "home_id": 4752,
+      "away_id": 4479
+    },
+    {
+      "home_id": 4792,
+      "away_id": 4699
+    },
+    {
+      "home_id": 4699,
+      "away_id": 4479
+    },
+    {
+      "home_id": 4752,
+      "away_id": 4792
+    },
+    {
+      "home_id": 4699,
+      "away_id": 4752
+    },
+    {
+      "home_id": 4479,
+      "away_id": 4792
+    }
+  ],
+  "3956": [
+    {
+      "home_id": 4748,
+      "away_id": 4778
+    },
+    {
+      "home_id": 7229,
+      "away_id": 4695
+    },
+    {
+      "home_id": 4695,
+      "away_id": 4778
+    },
+    {
+      "home_id": 4748,
+      "away_id": 7229
+    },
+    {
+      "home_id": 4695,
+      "away_id": 4748
+    },
+    {
+      "home_id": 4778,
+      "away_id": 7229
+    }
+  ],
+  "3957": [
+    {
+      "home_id": 4724,
+      "away_id": 4789
+    },
+    {
+      "home_id": 4741,
+      "away_id": 4700
+    },
+    {
+      "home_id": 4724,
+      "away_id": 4741
+    },
+    {
+      "home_id": 4700,
+      "away_id": 4789
+    },
+    {
+      "home_id": 4700,
+      "away_id": 4724
+    },
+    {
+      "home_id": 4789,
+      "away_id": 4741
+    }
+  ],
+  "3958": [
+    {
+      "home_id": 4711,
+      "away_id": 55827
+    },
+    {
+      "home_id": 4768,
+      "away_id": 4757
+    },
+    {
+      "home_id": 4711,
+      "away_id": 4768
+    },
+    {
+      "home_id": 4757,
+      "away_id": 55827
+    },
+    {
+      "home_id": 4757,
+      "away_id": 4711
+    },
+    {
+      "home_id": 55827,
+      "away_id": 4768
+    }
+  ],
+  "3959": [
+    {
+      "home_id": 4705,
+      "away_id": 4770
+    },
+    {
+      "home_id": 4688,
+      "away_id": 4729
+    },
+    {
+      "home_id": 4705,
+      "away_id": 4688
+    },
+    {
+      "home_id": 4729,
+      "away_id": 4770
+    },
+    {
+      "home_id": 4729,
+      "away_id": 4705
+    },
+    {
+      "home_id": 4770,
+      "away_id": 4688
+    }
+  ],
+  "3960": [
+    {
+      "home_id": 4717,
+      "away_id": 4758
+    },
+    {
+      "home_id": 4766,
+      "away_id": 4784
+    },
+    {
+      "home_id": 4717,
+      "away_id": 4766
+    },
+    {
+      "home_id": 4784,
+      "away_id": 4758
+    },
+    {
+      "home_id": 4758,
+      "away_id": 4766
+    },
+    {
+      "home_id": 4784,
+      "away_id": 4717
+    }
+  ],
+  "3961": [
+    {
+      "home_id": 4698,
+      "away_id": 4753
+    },
+    {
+      "home_id": 4834,
+      "away_id": 4725
+    },
+    {
+      "home_id": 4698,
+      "away_id": 4834
+    },
+    {
+      "home_id": 4725,
+      "away_id": 4753
+    },
+    {
+      "home_id": 4725,
+      "away_id": 4698
+    },
+    {
+      "home_id": 4753,
+      "away_id": 4834
+    }
+  ],
+  "139403": [
+    {
+      "home_id": 4481,
+      "away_id": 4739
+    },
+    {
+      "home_id": 4767,
+      "away_id": 4475
+    },
+    {
+      "home_id": 4481,
+      "away_id": 4767
+    },
+    {
+      "home_id": 4475,
+      "away_id": 4739
+    },
+    {
+      "home_id": 4475,
+      "away_id": 4481
+    },
+    {
+      "home_id": 4739,
+      "away_id": 4767
+    }
+  ],
+  "139404": [
+    {
+      "home_id": 4819,
+      "away_id": 4691
+    },
+    {
+      "home_id": 4718,
+      "away_id": 4771
+    },
+    {
+      "home_id": 4819,
+      "away_id": 4718
+    },
+    {
+      "home_id": 4771,
+      "away_id": 4691
+    },
+    {
+      "home_id": 4771,
+      "away_id": 4819
+    },
+    {
+      "home_id": 4691,
+      "away_id": 4718
+    }
+  ],
+  "139405": [
+    {
+      "home_id": 4704,
+      "away_id": 4823
+    },
+    {
+      "home_id": 4723,
+      "away_id": 4820
+    },
+    {
+      "home_id": 4704,
+      "away_id": 4723
+    },
+    {
+      "home_id": 4820,
+      "away_id": 4823
+    },
+    {
+      "home_id": 4820,
+      "away_id": 4704
+    },
+    {
+      "home_id": 4823,
+      "away_id": 4723
+    }
+  ],
+  "139406": [
+    {
+      "home_id": 4713,
+      "away_id": 4715
+    },
+    {
+      "home_id": 4764,
+      "away_id": 5164
+    },
+    {
+      "home_id": 4713,
+      "away_id": 4764
+    },
+    {
+      "home_id": 5164,
+      "away_id": 4715
+    },
+    {
+      "home_id": 5164,
+      "away_id": 4713
+    },
+    {
+      "home_id": 4715,
+      "away_id": 4764
+    }
+  ]
+}

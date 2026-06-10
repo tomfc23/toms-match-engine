@@ -1,0 +1,338 @@
+{
+  "4781": {
+    "name": "Mexico",
+    "ranking": 15,
+    "primary_color": "#1a4d3e",
+    "secondary_color": "#960000",
+    "img_path": "https://img.sofascore.com/api/v1/team/4781/image"
+  },
+  "4736": {
+    "name": "South Africa",
+    "ranking": 60,
+    "primary_color": "#ffd800",
+    "secondary_color": "#008040",
+    "img_path": "https://img.sofascore.com/api/v1/team/4736/image"
+  },
+  "4735": {
+    "name": "South Korea",
+    "ranking": 25,
+    "primary_color": "#ff0000",
+    "secondary_color": "#0000ff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4735/image"
+  },
+  "4714": {
+    "name": "Czechia",
+    "ranking": 41,
+    "primary_color": "#cc0000",
+    "secondary_color": "#025095",
+    "img_path": "https://img.sofascore.com/api/v1/team/4714/image"
+  },
+  "4752": {
+    "name": "Canada",
+    "ranking": 30,
+    "primary_color": "#ff0000",
+    "secondary_color": "#ffffff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4752/image"
+  },
+  "4479": {
+    "name": "Bosnia & Herzegovina",
+    "ranking": 65,
+    "primary_color": "#2d4a99",
+    "secondary_color": "#ffffff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4479/image"
+  },
+  "4792": {
+    "name": "Qatar",
+    "ranking": 55,
+    "primary_color": "#660000",
+    "secondary_color": "#ffffff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4792/image"
+  },
+  "4699": {
+    "name": "Switzerland",
+    "ranking": 19,
+    "primary_color": "#ff0000",
+    "secondary_color": "#ffffff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4699/image"
+  },
+  "4748": {
+    "name": "Brazil",
+    "ranking": 6,
+    "primary_color": "#ffff00",
+    "secondary_color": "#009933",
+    "img_path": "https://img.sofascore.com/api/v1/team/4748/image"
+  },
+  "4778": {
+    "name": "Morocco",
+    "ranking": 8,
+    "primary_color": "#ff0000",
+    "secondary_color": "#006600",
+    "img_path": "https://img.sofascore.com/api/v1/team/4778/image"
+  },
+  "7229": {
+    "name": "Haiti",
+    "ranking": 83,
+    "primary_color": "#3b5aa3",
+    "secondary_color": "#be0027",
+    "img_path": "https://img.sofascore.com/api/v1/team/7229/image"
+  },
+  "4695": {
+    "name": "Scotland",
+    "ranking": 43,
+    "primary_color": "#00005e",
+    "secondary_color": "#ffffff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4695/image"
+  },
+  "4724": {
+    "name": "USA",
+    "ranking": 16,
+    "primary_color": "#ffffff",
+    "secondary_color": "#ff0000",
+    "img_path": "https://img.sofascore.com/api/v1/team/4724/image"
+  },
+  "4789": {
+    "name": "Paraguay",
+    "ranking": 40,
+    "primary_color": "#ff0000",
+    "secondary_color": "#045ca3",
+    "img_path": "https://img.sofascore.com/api/v1/team/4789/image"
+  },
+  "4741": {
+    "name": "Australia",
+    "ranking": 27,
+    "primary_color": "#ffcc00",
+    "secondary_color": "#2d324b",
+    "img_path": "https://img.sofascore.com/api/v1/team/4741/image"
+  },
+  "4700": {
+    "name": "T\u00fcrkiye",
+    "ranking": 22,
+    "primary_color": "#ffffff",
+    "secondary_color": "#ff0000",
+    "img_path": "https://img.sofascore.com/api/v1/team/4700/image"
+  },
+  "4711": {
+    "name": "Germany",
+    "ranking": 10,
+    "primary_color": "#ffffff",
+    "secondary_color": "#000000",
+    "img_path": "https://img.sofascore.com/api/v1/team/4711/image"
+  },
+  "55827": {
+    "name": "Cura\u00e7ao",
+    "ranking": 82,
+    "primary_color": "#004990",
+    "secondary_color": "#000fff",
+    "img_path": "https://img.sofascore.com/api/v1/team/55827/image"
+  },
+  "4768": {
+    "name": "C\u00f4te d'Ivoire",
+    "ranking": 34,
+    "primary_color": "#f77f00",
+    "secondary_color": "#009e60",
+    "img_path": "https://img.sofascore.com/api/v1/team/4768/image"
+  },
+  "4757": {
+    "name": "Ecuador",
+    "ranking": 23,
+    "primary_color": "#ffff00",
+    "secondary_color": "#000063",
+    "img_path": "https://img.sofascore.com/api/v1/team/4757/image"
+  },
+  "4705": {
+    "name": "Netherlands",
+    "ranking": 7,
+    "primary_color": "#ff6600",
+    "secondary_color": "#281fe0",
+    "img_path": "https://img.sofascore.com/api/v1/team/4705/image"
+  },
+  "4770": {
+    "name": "Japan",
+    "ranking": 18,
+    "primary_color": "#000080",
+    "secondary_color": "#ed1b24",
+    "img_path": "https://img.sofascore.com/api/v1/team/4770/image"
+  },
+  "4688": {
+    "name": "Sweden",
+    "ranking": 38,
+    "primary_color": "#ffcc00",
+    "secondary_color": "#0000ff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4688/image"
+  },
+  "4729": {
+    "name": "Tunisia",
+    "ranking": 44,
+    "primary_color": "#ffffff",
+    "secondary_color": "#ffffff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4729/image"
+  },
+  "4717": {
+    "name": "Belgium",
+    "ranking": 9,
+    "primary_color": "#ff0033",
+    "secondary_color": "#000000",
+    "img_path": "https://img.sofascore.com/api/v1/team/4717/image"
+  },
+  "4758": {
+    "name": "Egypt",
+    "ranking": 29,
+    "primary_color": "#f00000",
+    "secondary_color": "#ffffff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4758/image"
+  },
+  "4766": {
+    "name": "Iran",
+    "ranking": 21,
+    "primary_color": "#ffffff",
+    "secondary_color": "#cc0000",
+    "img_path": "https://img.sofascore.com/api/v1/team/4766/image"
+  },
+  "4784": {
+    "name": "New Zealand",
+    "ranking": 85,
+    "primary_color": "#ffffff",
+    "secondary_color": "#000000",
+    "img_path": "https://img.sofascore.com/api/v1/team/4784/image"
+  },
+  "4698": {
+    "name": "Spain",
+    "ranking": 2,
+    "primary_color": "#cc0000",
+    "secondary_color": "#ffffff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4698/image"
+  },
+  "4753": {
+    "name": "Cabo Verde",
+    "ranking": 69,
+    "primary_color": "#21418e",
+    "secondary_color": "#ff0000",
+    "img_path": "https://img.sofascore.com/api/v1/team/4753/image"
+  },
+  "4834": {
+    "name": "Saudi Arabia",
+    "ranking": 61,
+    "primary_color": "#ffffff",
+    "secondary_color": "#008000",
+    "img_path": "https://img.sofascore.com/api/v1/team/4834/image"
+  },
+  "4725": {
+    "name": "Uruguay",
+    "ranking": 17,
+    "primary_color": "#7eacfe",
+    "secondary_color": "#000000",
+    "img_path": "https://img.sofascore.com/api/v1/team/4725/image"
+  },
+  "4481": {
+    "name": "France",
+    "ranking": 1,
+    "primary_color": "#01509e",
+    "secondary_color": "#e30613",
+    "img_path": "https://img.sofascore.com/api/v1/team/4481/image"
+  },
+  "4739": {
+    "name": "Senegal",
+    "ranking": 14,
+    "primary_color": "#ffffff",
+    "secondary_color": "#047151",
+    "img_path": "https://img.sofascore.com/api/v1/team/4739/image"
+  },
+  "4767": {
+    "name": "Iraq",
+    "ranking": 57,
+    "primary_color": "#ffffff",
+    "secondary_color": "#108f5b",
+    "img_path": "https://img.sofascore.com/api/v1/team/4767/image"
+  },
+  "4475": {
+    "name": "Norway",
+    "ranking": 31,
+    "primary_color": "#ef2b2d",
+    "secondary_color": "#001f5b",
+    "img_path": "https://img.sofascore.com/api/v1/team/4475/image"
+  },
+  "4819": {
+    "name": "Argentina",
+    "ranking": 3,
+    "primary_color": "#66ccff",
+    "secondary_color": "#ffffff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4819/image"
+  },
+  "4691": {
+    "name": "Algeria",
+    "ranking": 28,
+    "primary_color": "#ffffff",
+    "secondary_color": "#23bc55",
+    "img_path": "https://img.sofascore.com/api/v1/team/4691/image"
+  },
+  "4718": {
+    "name": "Austria",
+    "ranking": 24,
+    "primary_color": "#ff0000",
+    "secondary_color": "#ffffff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4718/image"
+  },
+  "4771": {
+    "name": "Jordan",
+    "ranking": 63,
+    "primary_color": "#ffffff",
+    "secondary_color": "#ff0000",
+    "img_path": "https://img.sofascore.com/api/v1/team/4771/image"
+  },
+  "4704": {
+    "name": "Portugal",
+    "ranking": 5,
+    "primary_color": "#cc0000",
+    "secondary_color": "#66cc66",
+    "img_path": "https://img.sofascore.com/api/v1/team/4704/image"
+  },
+  "4823": {
+    "name": "DR Congo",
+    "ranking": 46,
+    "primary_color": "#007fff",
+    "secondary_color": "#f8181e",
+    "img_path": "https://img.sofascore.com/api/v1/team/4823/image"
+  },
+  "4723": {
+    "name": "Uzbekistan",
+    "ranking": 50,
+    "primary_color": "#0080ff",
+    "secondary_color": "#ffffff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4723/image"
+  },
+  "4820": {
+    "name": "Colombia",
+    "ranking": 13,
+    "primary_color": "#ffd808",
+    "secondary_color": "#000066",
+    "img_path": "https://img.sofascore.com/api/v1/team/4820/image"
+  },
+  "4713": {
+    "name": "England",
+    "ranking": 4,
+    "primary_color": "#ffffff",
+    "secondary_color": "#cc0000",
+    "img_path": "https://img.sofascore.com/api/v1/team/4713/image"
+  },
+  "4715": {
+    "name": "Croatia",
+    "ranking": 11,
+    "primary_color": "#ff0000",
+    "secondary_color": "#ffffff",
+    "img_path": "https://img.sofascore.com/api/v1/team/4715/image"
+  },
+  "4764": {
+    "name": "Ghana",
+    "ranking": 74,
+    "primary_color": "#ff0000",
+    "secondary_color": "#ffff00",
+    "img_path": "https://img.sofascore.com/api/v1/team/4764/image"
+  },
+  "5164": {
+    "name": "Panama",
+    "ranking": 33,
+    "primary_color": "#cc0000",
+    "secondary_color": "#005293",
+    "img_path": "https://img.sofascore.com/api/v1/team/5164/image"
+  }
+}
