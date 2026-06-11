@@ -195,14 +195,39 @@ def check_lineup(lineup):
     
     return invalid_players
 
-@app.get("/sim_group/{group_id}")
-def sim_group(group_id, num_sims):
+@app.get('/group_teams/{group_id}')
+def get_group_teams(group_id):
+    with open(DATA_DIR / 'group_schedules.json', 'r') as f:
+        group_schedules = json.load(f)
+
+    selected_group_schedule = group_schedules[group_id]
+
+    teams = set()
+
+    for game in selected_group_schedule:
+        teams.add(game.get('home_id'))
+        teams.add(game.get('away_id'))
+
+    return list(teams)
+
+@app.post("/sim_group")
+def sim_group(payload: dict):
     average_standings = {}
     average_game_log = {}
+
+    num_sims = payload.get('num_sims')
+    group_id = str(payload.get('group_id'))
+    custom_lineups = payload.get('custom_lineups', False)
+    
+    lineups = payload.get('lineups')
+
     num_sims = int(num_sims)
     for _ in range(num_sims):
-        sim_data = sim_group_single(group_id)
-        
+        if custom_lineups:
+            sim_data = sim_group_single(group_id, lineups=lineups)
+        else:
+            sim_data = sim_group_single(group_id)
+
         standings = sim_data['standings']
         game_log = sim_data['game_log']
 
@@ -252,7 +277,7 @@ def sim_group(group_id, num_sims):
         'game_log': average_game_log
     }
 
-def sim_group_single(group_id: str):
+def sim_group_single(group_id: str, lineups=None):
     with open(DATA_DIR / 'group_schedules.json', 'r') as f:
         group_schedules = json.load(f)
 
@@ -267,13 +292,24 @@ def sim_group_single(group_id: str):
 
         event_id = f'{home_id}_{away_id}'
 
-        payload = {
-            'home_id': home_id,
-            'away_id': away_id,
-            'num_sims': 1,
-            'num_lineups': 1,
-            'custom_lineup': False
-        }
+        if lineups is None:
+            payload = {
+                'home_id': home_id,
+                'away_id': away_id,
+                'num_sims': 1,
+                'num_lineups': 1,
+                'custom_lineup': False
+            }
+        else:
+            payload = {
+                'home_id': home_id,
+                'away_id': away_id,
+                'num_sims': 1,
+                'num_lineups': 1,
+                'custom_lineup': True,
+                'home_lineup': lineups[str(home_id)],
+                'away_lineup': lineups[str(away_id)]
+            }
 
         results = simulate(payload)
 
