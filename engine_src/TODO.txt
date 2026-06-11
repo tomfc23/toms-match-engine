@@ -1,2 +1,0 @@
-- Add club boost to attributes
-- add nation boost to probs
