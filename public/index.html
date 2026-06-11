@@ -439,11 +439,22 @@
         <!-- ── Group Sim Panel ── -->
         <div id="panel_group" style="display:none;" class="group-sim-controls">
             <label for="group_select">Select Group:</label>
-            <select id="group_select"></select>
+            <select id="group_select" onchange="updateGroupTeamSelect()"></select>
             <br><br>
             <label for="group_num_sims_input">Number of Sims:</label>
             <input id="group_num_sims_input" type="number" value="1000" placeholder="e.g. 1000">
             <br><br>
+            <label style="font-family: monospace;">
+                <input type="checkbox" id="group_custom_lineups_checkbox" onchange="toggleGroupCustomLineups()"> Use Custom Lineups
+            </label>
+            <div id="group_custom_lineups_container" style="display: none; margin-top: 10px; border: 1px solid #ccc; padding: 15px; background: #f9f9f9;">
+                <label style="font-family: monospace; display: block; margin-bottom: 10px;">
+                    <input type="checkbox" id="group_allow_oop_checkbox" onchange="toggleGroupOOP()"> Allow Out of Position Players
+                </label>
+                <div class="lineup-builder" id="group_lineups_builder" style="justify-content: center; margin-top: 10px; gap: 20px;">
+                </div>
+            </div>
+            <br>
             <p id="group_warnings"> </p>
             <button type="button" onclick="simulateGroup()" id="group_sim_button">Simulate Group!</button>
         </div>
@@ -454,6 +465,10 @@
 
             let global_teams_data = {};
             let global_invalid_players = new Set();
+            let global_individual_lineups = {
+                home: { formation: '4-3-3', players: [] },
+                away: { formation: '4-3-3', players: [] }
+            };
             async function populateTeamDropdowns() {
                 try {
                     const response = await fetch(`${API_URL}/teams`)
@@ -621,6 +636,32 @@
                 renderLineupBuilder('away');
             }
 
+            function toggleGroupOOP() {
+                const group_id = document.getElementById('group_select').value;
+                if (!group_id) return;
+                Object.keys(global_group_lineups).forEach(teamId => {
+                    const pitch = document.getElementById(`group_pitch_${teamId}`);
+                    if (pitch) renderSingleGroupLineup(teamId);
+                });
+            }
+
+            function updateIndividualLineupState(side) {
+                const formation = document.getElementById(`${side}_formation_select`).value;
+                const rows = FORMATIONS[formation];
+                const players = [];
+
+                rows.forEach((count, rowIndex) => {
+                    const row = [];
+                    for (let i = 0; i < count; i++) {
+                        const sel = document.getElementById(`${side}_r${rowIndex}_p${i}`);
+                        row.push(sel ? parseInt(sel.value) : null);
+                    }
+                    players.push(row);
+                });
+
+                global_individual_lineups[side] = { formation, players };
+            }
+
             function renderLineupBuilder(side) {
                 const teamId  = document.getElementById(`${side}_team_select`).value;
                 const teamName = global_teams_data[teamId]?.name || (side === 'home' ? 'Home' : 'Away');
@@ -660,49 +701,61 @@
                     container.appendChild(rowDiv);
 
                      // Only show players whose position matches this row, unless OOP is allowed
-                     const allowOOP = document.getElementById('allow_oop_checkbox').checked;
-                     const filteredSquad = sortedSquad.filter(playerId => {
+                    const allowOOP = document.getElementById('group_allow_oop_checkbox').checked;
+                    const filteredSquad = sortedSquad.filter(playerId => {
                          if (allowOOP) return true;
                          const pos = POSITION_MAP[global_bios_data_lineup[playerId]?.base_position];
                          return pos === label;
                      });
 
-                     for (let i = 0; i < count; i++) {
-                         const slot = document.createElement('div');
-                         slot.className = 'player-slot';
-                         slot.textContent = '+';
+                    for (let i = 0; i < count; i++) {
+                        const slot = document.createElement('div');
+                        slot.className = 'player-slot';
+                        slot.textContent = '+';
 
-                         const img = document.createElement('img');
-                         img.className = 'player-slot-img';
-                         img.id = `${side}_img_${rowIndex}_${i}`;
-                         img.style.display = 'none';
-                         slot.appendChild(img);
+                        const img = document.createElement('img');
+                        img.className = 'player-slot-img';
+                        img.id = `${side}_img_${rowIndex}_${i}`;
+                        img.style.display = 'none';
+                        slot.appendChild(img);
 
-                         const sel = document.createElement('select');
-                         sel.className = 'player-select';
-                         sel.id = `${side}_r${rowIndex}_p${i}`;
-                         sel.onchange = () => {
-                             refreshPlayerSelectOptions(side);
-                             updateSlotImage(side, rowIndex, i);
-                         };
+                        const sel = document.createElement('select');
+                        sel.className = 'player-select';
+                        sel.id = `${side}_r${rowIndex}_p${i}`;
+                        sel.onchange = () => {
+                            refreshPlayerSelectOptions(side);
+                            updateSlotImage(side, rowIndex, i);
+                            updateIndividualLineupState(side);
+                        };
 
-                         const blank = document.createElement('option');
-                         blank.value = '';
-                         blank.textContent = '— pick —';
-                         sel.appendChild(blank);
+                        const blank = document.createElement('option');
+                        blank.value = '';
+                        blank.textContent = '— pick —';
+                        sel.appendChild(blank);
 
-                         filteredSquad.forEach(playerId => {
-                             const bio = global_bios_data_lineup[playerId];
-                             if (!bio) return;
-                             const opt = document.createElement('option');
-                             opt.value = playerId;
-                             opt.textContent = bio.name;
-                             sel.appendChild(opt);
-                         });
+                        filteredSquad.forEach(playerId => {
+                            const bio = global_bios_data_lineup[playerId];
+                            if (!bio) return;
+                            const opt = document.createElement('option');
+                            opt.value = playerId;
+                            opt.textContent = bio.name;
+                            sel.appendChild(opt);
+                        });
 
-                         slot.appendChild(sel);
-                         playersDiv.appendChild(slot);
-                     }
+                        // Restore from state
+                        const existingPlayers = global_individual_lineups[side]?.players;
+                        if (existingPlayers && existingPlayers[rowIndex] && existingPlayers[rowIndex][i]) {
+                            const savedId = existingPlayers[rowIndex][i];
+                            sel.value = savedId;
+                            if (savedId) {
+                                img.src = global_bios_data_lineup[savedId]?.img_path || '';
+                                img.style.display = 'block';
+                            }
+                        }
+
+                        slot.appendChild(sel);
+                        playersDiv.appendChild(slot);
+                    }
                 });
 
                 refreshPlayerSelectOptions(side);
@@ -1287,6 +1340,231 @@
 
             populateTeamDropdowns();
             populateGroupDropdown();
+            
+            let global_group_lineups = {};
+
+            async function renderAllGroupLineups(teams) {
+                const container = document.getElementById('group_lineups_builder');
+                container.innerHTML = '';
+
+                teams.forEach(teamId => {
+                    const teamName = global_teams_data[teamId]?.name || `Team ${teamId}`;
+                    const sideDiv = document.createElement('div');
+                    sideDiv.className = 'lineup-side';
+                    sideDiv.innerHTML = `
+                        <h3>${teamName} Lineup</h3>
+                        <div class="lineup-controls">
+                            <label>Formation:
+                                <select id="group_formation_${teamId}" onchange="updateGroupFormation('${teamId}')"></select>
+                            </label>
+                            <span id="group_status_${teamId}" style="font-family: monospace; font-size: 0.8em; color: #888;"></span>
+                        </div>
+                        <div class="lineup-pitch" id="group_pitch_${teamId}"></div>
+                    `;
+                    container.appendChild(sideDiv);
+
+                    const formSel = document.getElementById(`group_formation_${teamId}`);
+                    Object.keys(FORMATIONS).forEach(f => {
+                        const opt = document.createElement('option');
+                        opt.value = f;
+                        opt.textContent = f;
+                        if (f === global_group_lineups[teamId].formation) opt.selected = true;
+                        formSel.appendChild(opt);
+                    });
+
+                    renderSingleGroupLineup(teamId);
+                });
+            }
+
+            function updateGroupFormation(teamId) {
+                const newFormation = document.getElementById(`group_formation_${teamId}`).value;
+                global_group_lineups[teamId].formation = newFormation;
+                renderSingleGroupLineup(teamId);
+            }
+
+            function renderSingleGroupLineup(teamId) {
+                const formation = global_group_lineups[teamId].formation;
+                const rows = FORMATIONS[formation];
+                const squad = global_squads_data[teamId] || [];
+
+                const posOrder = { GK: 0, DEF: 1, MID: 2, FWD: 3 };
+                const sortedSquad = [...squad].sort((a, b) => {
+                    const pa = posOrder[POSITION_MAP[global_bios_data_lineup[a]?.base_position]] ?? 9;
+                    const pb = posOrder[POSITION_MAP[global_bios_data_lineup[b]?.base_position]] ?? 9;
+                    if (pa !== pb) return pa - pb;
+                    return (global_bios_data_lineup[a]?.name || '').localeCompare(global_bios_data_lineup[b]?.name || '');
+                });
+
+                const container = document.getElementById(`group_pitch_${teamId}`);
+                container.innerHTML = '';
+
+                const existingPlayers = global_group_lineups[teamId].players;
+
+                rows.forEach((count, rowIndex) => {
+                    const label = getRowLabel(rows, rowIndex);
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'lineup-row';
+
+                    const labelDiv = document.createElement('div');
+                    labelDiv.className = 'lineup-row-label';
+                    labelDiv.textContent = label;
+                    rowDiv.appendChild(labelDiv);
+
+                    const playersDiv = document.createElement('div');
+                    playersDiv.className = 'lineup-row-players';
+                    rowDiv.appendChild(playersDiv);
+
+                    container.appendChild(rowDiv);
+
+                    const allowOOP = document.getElementById('group_allow_oop_checkbox').checked;
+                    const filteredSquad = sortedSquad.filter(playerId => {
+                        if (allowOOP) return true;
+                        const pos = POSITION_MAP[global_bios_data_lineup[playerId]?.base_position];
+                        return pos === label;
+                    });
+
+                    for (let i = 0; i < count; i++) {
+                        const slot = document.createElement('div');
+                        slot.className = 'player-slot';
+                        slot.textContent = '+';
+
+                        const img = document.createElement('img');
+                        img.className = 'player-slot-img';
+                        img.style.display = 'none';
+                        slot.appendChild(img);
+
+                        const sel = document.createElement('select');
+                        sel.className = 'player-select';
+                        sel.id = `group_sel_${teamId}_r${rowIndex}_p${i}`;
+                        sel.onchange = () => {
+                            updateGroupPlayerSelectOptions();
+                            updateGroupLineupState(teamId);
+
+                            const playerId = sel.value;
+                            if (playerId) {
+                                img.src = global_bios_data_lineup[playerId]?.img_path || '';
+                                img.style.display = 'block';
+                            } else {
+                                img.src = '';
+                                img.style.display = 'none';
+                            }
+                        };
+
+                        const blank = document.createElement('option');
+                        blank.value = '';
+                        blank.textContent = '— pick —';
+                        sel.appendChild(blank);
+
+                        filteredSquad.forEach(playerId => {
+                            const bio = global_bios_data_lineup[playerId];
+                            if (!bio) return;
+                            const opt = document.createElement('option');
+                            opt.value = playerId;
+                            opt.textContent = bio.name;
+                            sel.appendChild(opt);
+                        });
+
+                        if (existingPlayers && existingPlayers[rowIndex] && existingPlayers[rowIndex][i]) {
+                            const savedId = existingPlayers[rowIndex][i];
+                            sel.value = savedId;
+                            if (savedId) {
+                                img.src = global_bios_data_lineup[savedId]?.img_path || '';
+                                img.style.display = 'block';
+                            }
+                        }
+
+                        slot.appendChild(sel);
+                        playersDiv.appendChild(slot);
+                    }
+                });
+
+                updateGroupPlayerSelectOptions();
+                updateGroupLineupState(teamId);
+            }
+
+            function updateGroupLineupState(teamId) {
+                const pitch = document.getElementById(`group_pitch_${teamId}`);
+                if (!pitch) return;
+
+                const rows = pitch.querySelectorAll('.lineup-row-players');
+                const players = [];
+                let filledCount = 0;
+                let totalCount = 0;
+
+                rows.forEach(rowDiv => {
+                    const rowPlayers = [];
+                    const selects = rowDiv.querySelectorAll('.player-select');
+                    selects.forEach(sel => {
+                        const val = sel.value;
+                        rowPlayers.push(val ? parseInt(val) : null);
+                        if (val) filledCount++;
+                        totalCount++;
+                    });
+                    players.push(rowPlayers);
+                });
+
+                global_group_lineups[teamId].players = players;
+
+                const statusEl = document.getElementById(`group_status_${teamId}`);
+                if (statusEl) {
+                    statusEl.textContent = `${filledCount}/${totalCount} selected`;
+                    statusEl.style.color = filledCount === totalCount ? '#2d7a2d' : '#888';
+                }
+            }
+
+            function updateGroupPlayerSelectOptions() {
+                const allSelects = document.querySelectorAll('#group_lineups_builder .player-select');
+                const chosenIds = new Set();
+                allSelects.forEach(s => { if (s.value) chosenIds.add(s.value); });
+
+                allSelects.forEach(sel => {
+                    const current = sel.value;
+                    Array.from(sel.options).forEach(opt => {
+                        opt.disabled = opt.value !== '' && opt.value !== current && chosenIds.has(opt.value);
+                    });
+                });
+            }
+
+            async function updateGroupTeamSelect() {
+                const group_id = document.getElementById('group_select').value;
+                if (!group_id) return;
+
+                try {
+                    const res = await fetch(`${API_URL}/group_teams/${group_id}`);
+                    if (!res.ok) throw new Error('Failed to fetch group teams');
+                    const teams = await res.json();
+
+                    teams.forEach(teamId => {
+                        if (!global_group_lineups[teamId]) {
+                            global_group_lineups[teamId] = { formation: '4-3-3', players: [] };
+                        }
+                    });
+
+                    if (document.getElementById('group_custom_lineups_checkbox').checked) {
+                        renderAllGroupLineups(teams);
+                    }
+                } catch (e) {
+                    console.error('Error updating group team select:', e);
+                }
+            }
+
+            async function toggleGroupCustomLineups() {
+                const checkbox = document.getElementById('group_custom_lineups_checkbox');
+                const container = document.getElementById('group_custom_lineups_container');
+                if (!checkbox.checked) {
+                    container.style.display = 'none';
+                    return;
+                }
+                container.style.display = 'block';
+                try {
+                    await loadSquadsAndBios();
+                    await updateGroupTeamSelect();
+                } catch (e) {
+                    console.error('Failed to load squad data for group simulation:', e);
+                }
+            }
+            
+
 
             function populateGroupDropdown() {
                 const sel = document.getElementById('group_select');
@@ -1315,9 +1593,29 @@
                 results_div.innerHTML = '';
 
                 try {
-                    const res = await fetch(`${API_URL}/sim_group/${group_id}?num_sims=${num_sims}`);
+                    const use_custom = document.getElementById('group_custom_lineups_checkbox').checked;
+                    const lineups = {};
+                    if (use_custom) {
+                        Object.keys(global_group_lineups).forEach(teamId => {
+                            lineups[teamId] = global_group_lineups[teamId].players;
+                        });
+                    }
+
+                    const res = await fetch(`${API_URL}/sim_group`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            num_sims: num_sims,
+                            group_id: group_id,
+                            custom_lineups: use_custom,
+                            lineups: lineups
+                        })
+                    });
                     if (!res.ok) throw new Error(`HTTP ${res.status}`);
                     const data = await res.json();
+
 
                     // data.standings: { team_id: { points, gd } }
                     // data.game_log:  { "homeid_awayid": { home_goals, away_goals } }
@@ -1363,23 +1661,11 @@
 
                     Object.entries(data.game_log).forEach(([key, score]) => {
                         // key is "homeid_awayid" — split on underscore
-                        const parts = key.match(/^(\d+)(\d{4})$/) || null;
-                        // IDs are 4 digits each based on sample (4781, 4736 etc)
-                        // Use a smarter split: try all split points
-                        let home_id = null, away_id = null;
-                        // Find the split by checking which sub-strings exist in teams data
-                        const k = key;
-                        for (let i = 1; i < k.length; i++) {
-                            const h = k.slice(0, i);
-                            const a = k.slice(i);
-                            if (global_teams_data[h] && global_teams_data[a]) {
-                                home_id = h; away_id = a; break;
-                            }
-                        }
-                        if (!home_id) {
+                        let [home_id, away_id] = key.split('_');
+                        if (!home_id || !away_id || !global_teams_data[home_id] || !global_teams_data[away_id]) {
                             // fallback: split in half
-                            home_id = k.slice(0, Math.floor(k.length / 2));
-                            away_id = k.slice(Math.floor(k.length / 2));
+                            home_id = key.slice(0, Math.floor(key.length / 2));
+                            away_id = key.slice(Math.floor(key.length / 2));
                         }
 
                         const home_team = global_teams_data[home_id] || {};
