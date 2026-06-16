@@ -61,21 +61,6 @@ class LineupGen:
         with open(DATA_DIR / 'player_bios.json', 'r', encoding="utf-8") as f:
             self.player_bios = json.load(f)
 
-        with open(DATA_DIR / 'league_rankings.json', 'r') as f:
-            self.league_rankings = json.load(f)
-
-    def league_multiplier(self, player_id):
-        player_id = str(player_id)
-        league_id = str(self.player_bios[player_id].get('league_id'))
-        
-        if league_id not in self.league_rankings:
-            return 1.0
-        
-        rank = self.league_rankings[league_id]['position']
-        
-        multiplier = 1.0 + 0.20 * (1 - math.log(rank) / math.log(len(self.league_rankings)))
-        return multiplier
-
     def get_all_lineups(self):
         self.lineups = {}
         for team_id in self.squad_data:
